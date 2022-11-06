@@ -42,6 +42,12 @@ echo "################################"
 virsh -c qemu:///system vol-create-as default vol.raw 1G --format raw
 
 echo "################################"
-echo" crea un sistema de ficheros XFS en el volumen y móntalo en el directorio /var/www/html"
+echo "crea un sistema de ficheros XFS en el volumen y móntalo en el directorio /var/www/html"
 echo "################################"
 
+virsh -c qemu:///system  attach-disk maquina1 \
+--source /var/lib/libvirt/images/vol.raw \
+--target vdb \
+--persistent
+
+ssh -i /home/roberto/clave-ecdsa debian@$IPm1 'sudo mkdir -p /var/www/html && sudo mkfs.xfs /dev/vdb && sudo mount /dev/vdb /var/www/html'
