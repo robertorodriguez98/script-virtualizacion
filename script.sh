@@ -89,7 +89,7 @@ ssh -i ~/.ssh/clave-ecdsa debian@$IPm1 "sudo -- bash -c 'echo "allow-hotplug enp
 ssh -i ~/.ssh/clave-ecdsa debian@$IPm1 "sudo -- bash -c 'echo "iface enp8s0 inet dhcp">> /etc/network/interfaces'"
 
 virsh -c qemu:///system shutdown maquina1 
-sleep 10
+sleep 5
 virsh -c qemu:///system attach-interface --domain maquina1 \
                                          --type bridge \
                                          --source bridge0 \
@@ -105,3 +105,20 @@ echo "################################"
 IPpub=$(ssh debian@$IPm1 'ip address show enp8s0 | egrep -o -m 1 "(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-4]|2[0-5][0-9]|[01]?[0-9][0-9]?)){3}" | egrep -v "255"')
 
 echo "La IP que ha recibido la máquina a través del bridge es: $IPpub"
+
+echo "################################"
+echo "11. Aumentar la ram a 2GB"
+echo "################################"
+
+virsh -c qemu:///system shutdown maquina1 
+sleep 5
+
+virsh -c qemu:///system setmaxmem maquina1 2G --config
+virsh -c qemu:///system setmem maquina1 2G --config
+
+echo "################################"
+echo "12. Crear snapshot"
+echo "################################"
+
+virsh -c qemu:///system snapshot-create-as maquina1 --name instantánea1 --description "snapshot-script" --atomic
+
