@@ -96,7 +96,7 @@ virsh -c qemu:///system attach-interface --domain maquina1 \
 										 --model virtio \
 										 --config
 virsh -c qemu:///system start maquina1
-sleep 15
+sleep 60
 
 echo "################################"
 echo "10. Mostrar ip"
@@ -111,14 +111,17 @@ echo "11. Aumentar la ram a 2GB"
 echo "################################"
 
 virsh -c qemu:///system shutdown maquina1 
-sleep 5
+sleep 30
 
 virsh -c qemu:///system setmaxmem maquina1 2G --config
 virsh -c qemu:///system setmem maquina1 2G --config
+
+virsh -c qemu:///system start maquina1
+sleep 15
 
 echo "################################"
 echo "12. Crear snapshot"
 echo "################################"
 
-virsh -c qemu:///system snapshot-create-as maquina1 --name instantánea1 --description "snapshot-script" --atomic
+virsh -c qemu:///system snapshot-create-as maquina1 --name instantánea1 --description "snapshot-script" --disk-only --atomic
 
