@@ -117,7 +117,7 @@ virsh -c qemu:///system setmaxmem maquina1 2G --config
 virsh -c qemu:///system setmem maquina1 2G --config
 
 virsh -c qemu:///system start maquina1
-sleep 15
+sleep 20
 
 echo "################################"
 echo "12. Crear snapshot"
