@@ -60,6 +60,9 @@ echo "################################"
 echo "6. Instala el servidor web apache2"
 echo "################################"
 
+# esta linea es para poder actualizar cuanod da problemas la red
+ssh -i ~/.ssh/clave-ecdsa debian@$IPm1 "sudo -- bash -c 'echo "deb http://deb.debian.org/debian/ bullseye main"> /etc/apt/sources.list'"
+ssh -i ~/.ssh/clave-ecdsa debian@$IPm1 'sudo apt update &>/dev/null && sudo apt install apache2 -y  &>/dev/null'
 ssh -i ~/.ssh/clave-ecdsa debian@$IPm1 'sudo apt update &>/dev/null && sudo apt install apache2 -y  &>/dev/null'
 scp -i ~/.ssh/clave-ecdsa index.html debian@$IPm1:/home/debian/index.html
 ssh -i ~/.ssh/clave-ecdsa debian@$IPm1 'sudo mv index.html /var/www/html/index.html'
