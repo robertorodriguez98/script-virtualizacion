@@ -75,3 +75,33 @@ read -p "Pulsa [INTRO] una vez has comprobado que funciona el servidor"
 echo "################################"
 echo "8. Instala LXC"
 echo "################################"
+
+ssh -i ~/.ssh/clave-ecdsa debian@$IPm1 'sudo apt install lxc -y  &>/dev/null'
+ssh -i ~/.ssh/clave-ecdsa debian@$IPm1 'sudo lxc-create -n contenedor1 -t debian -- -r bullseye &>/dev/null && sudo lxc-start contenedor1'
+
+echo "################################"
+echo "9. Añadir br0"
+echo "################################"
+
+# añado una linea debido a que el nombre de las interfaces en debian no es persistente
+ssh -i ~/.ssh/clave-ecdsa debian@$IPm1 "sudo -- bash -c 'echo "">> /etc/network/interfaces'"
+ssh -i ~/.ssh/clave-ecdsa debian@$IPm1 "sudo -- bash -c 'echo "allow-hotplug enp8s0">> /etc/network/interfaces'"
+ssh -i ~/.ssh/clave-ecdsa debian@$IPm1 "sudo -- bash -c 'echo "iface enp8s0 inet dhcp">> /etc/network/interfaces'"
+
+virsh -c qemu:///system shutdown maquina1 
+sleep 10
+virsh -c qemu:///system attach-interface --domain maquina1 \
+                                         --type bridge \
+                                         --source bridge0 \
+										 --model virtio \
+										 --config
+virsh -c qemu:///system start maquina1
+sleep 15
+
+echo "################################"
+echo "10. Mostrar ip"
+echo "################################"
+
+IPpub=$(ssh debian@$IPm1 'ip address show enp8s0 | egrep -o -m 1 "(\b25[0-5]|\b2[0-4][0-9]|\b[01]?[0-9][0-9]?)(\.(25[0-4]|2[0-5][0-9]|[01]?[0-9][0-9]?)){3}" | egrep -v "255"')
+
+echo "La IP que ha recibido la máquina a través del bridge es: $IPpub"
