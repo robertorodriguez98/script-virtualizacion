@@ -44,7 +44,7 @@ echo "################################"
 virsh -c qemu:///system vol-create-as default vol.raw 1G --format raw
 
 echo "################################"
-echo "crea un sistema de ficheros XFS en el volumen y móntalo en el directorio /var/www/html"
+echo "5. crea un sistema de ficheros XFS en el volumen y móntalo en el directorio /var/www/html"
 echo "################################"
 
 virsh -c qemu:///system  attach-disk maquina1 \
@@ -52,4 +52,23 @@ virsh -c qemu:///system  attach-disk maquina1 \
 --target vdb \
 --persistent
 
+# añado la el disco a fstab a también para que sea persistente tras reinicios
 ssh -i ~/.ssh/clave-ecdsa debian@$IPm1 'sudo mkdir -p /var/www/html && sudo mkfs.xfs /dev/vdb && sudo mount /dev/vdb /var/www/html'
+ssh -i ~/.ssh/clave-ecdsa debian@$IPm1"sudo -- bash -c 'echo "/dev/vdb        /var/www/html   xfs     defaults        0       0" >> /etc/fstab'"
+
+echo "################################"
+echo "6. Instala el servidor web apache2"
+echo "################################"
+
+ssh -i ~/.ssh/clave-ecdsa debian@$IPm1 'sudo apt update && apt install apache2'
+scp -i ~/.ssh/clave-ecdsa index.html debian@$IPm1:/home/debian/index.html
+ssh -i ~/.ssh/clave-ecdsa debian@$IPm1 'sudo mv index.html /var/www/html/index.html'
+
+
+echo "################################"
+echo "7. Comprobación del servidor Apache2"
+echo "################################"
+
+echo "La dirección IP del servidor es $IPm1"
+read -p "Pulsa [INTRO] una vez has comprobado que funciona el servidor"
+
